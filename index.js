@@ -11,6 +11,7 @@ const replaceTemplate = require('./modules/replaceTemplate');
 // ############## Blocking - synchronous way
 //##########################################################################################
 
+
 // const textIn = fs.readFileSync("./txt/input.txt", "utf-8");
 // console.log(textIn);
 // const newText = `This is what we know about the imposter :${textIn} \n Created on ${Date.now()}`;
