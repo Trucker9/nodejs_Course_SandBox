@@ -10,10 +10,6 @@ app.get("/", function (request, response) {
 
 
 
-
-
-
-
 // Start up the server
 const port = 3000;
 app.listen(port, () => {
