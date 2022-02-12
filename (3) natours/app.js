@@ -1,7 +1,6 @@
 // NOTE: configuring express should be done in this file
 const express = require('express');
 const morgan = require('morgan');
-const exp = require('constants');
 
 const userRouter = require('./routes/userRoutes');
 const tourRouter = require('./routes/tourRoutes');
@@ -24,20 +23,16 @@ app.use(express.json());
 app.use(express.static(`${__dirname}/public/`)); // now we can access it in browser with only file name: localhost/overview.html
 // Creating custom middleware:
 app.use((req, res, next) => {
-  console.log('Hello from the middleware 😀');
+  // console.log('Hello from the middleware 😀');
 
   // sending to the next middleware
   next();
 });
-app.use(express.json());
 app.use((req, res, next) => {
   // We used this when we sent the result.
   req.requestTime = new Date().toISOString();
   next();
 });
-//############################################
-//############################################ Route handlers
-// Moved to specific modules
 
 //############################################
 //############################################ Routes
@@ -45,6 +40,4 @@ app.use((req, res, next) => {
 // when there is a request on /api/v1/tours/?....  it will enter this middleware in the middleware stack and then the tourRouter will kick in.
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
-//############################################
-//############################################ Server
 module.exports = app;
