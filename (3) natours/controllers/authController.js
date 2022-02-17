@@ -44,6 +44,7 @@ exports.signup = catchAsync(async (req, res, next) => {
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
+    role: req.body.role,
   });
 
   createSendToken(newUser, 201, res);
@@ -116,23 +117,28 @@ exports.protect = catchAsync(async (req, res, next) => {
     );
   }
 
+  // Adding current user (later we need user info and we pick it up from req Object.)
   req.user = currentUser;
+  console.log('###################' + req.user);
   // GRANT ACCESS TO PROTECTED ROUTE
   next();
 });
 
-// exports.restrictTo = (...roles) => {
-//   return (req, res, next) => {
-//     // roles ['admin', 'lead-guide']. role='user'
-//     if (!roles.includes(req.user.role)) {
-//       return next(
-//         new AppError('You do not have permission to perform this action', 403)
-//       );
-//     }
+// We can not pass arguments to middleware functions. so we wrap the middleware in a wrapper function and we set our arguments in the wrapper.
+// wrapper has the arguments an all it does is to return the middleware function, BUT, middleware has access to wrapper arguments thanks to closures !!!!
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    // roles-> roles that have access to the current route. if user role is not part of the roles array, throws error.
+    console.log(req.user.role);
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
 
-//     next();
-//   };
-// };
+    next();
+  };
+};
 
 // exports.forgotPassword = catchAsync(async (req, res, next) => {
 //   // 1) Get user based on POSTed email

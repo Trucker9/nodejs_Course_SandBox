@@ -18,11 +18,15 @@ router
   .route('/')
   // If protect throws error, user can't access to the next middleware which is tour controller.
   .post(tourController.createTour)
-  .get(authController.protect ,tourController.getAllTours);
+  .get(authController.protect, tourController.getAllTours);
 router
   .route('/:id')
   .get(tourController.getTour)
-  .delete(tourController.deleteTour)
+  .delete(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour
+  )
   .patch(tourController.updateTour);
 
 module.exports = router;
