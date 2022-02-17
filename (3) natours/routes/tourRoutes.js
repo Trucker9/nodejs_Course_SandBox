@@ -1,5 +1,6 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
+const authController = require('../controllers/authController');
 
 const router = express.Router();
 
@@ -15,9 +16,9 @@ router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
 
 router
   .route('/')
-  // ###################### chaining multiple middleware functions (Can be used in access checks)
+  // If protect throws error, user can't access to the next middleware which is tour controller.
   .post(tourController.createTour)
-  .get(tourController.getAllTours);
+  .get(authController.protect ,tourController.getAllTours);
 router
   .route('/:id')
   .get(tourController.getTour)
