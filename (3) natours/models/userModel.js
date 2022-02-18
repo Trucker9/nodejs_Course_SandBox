@@ -42,13 +42,13 @@ const userSchema = new mongoose.Schema({
     },
   },
   passwordChangedAt: Date,
-  // passwordResetToken: String,
-  // passwordResetExpires: Date,
-  // active: {
-  //   type: Boolean,
-  //   default: true,
-  //   select: false,
-  // },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false,
+  },
 });
 
 // Right before saving the password we encrypt it.
@@ -69,14 +69,16 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.pre('save', function (next) {
+    // IF password property has been modified OR IF document is being created right now, return.
   if (!this.isModified('password') || this.isNew) return next();
-
+  // After this, 
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
+// Query middleware: when using any type of find method, find results that "active" = "true"
 userSchema.pre(/^find/, function (next) {
-  // this points to the current query
+  // this keyword points to the current query
   this.find({ active: { $ne: false } });
   next();
 });
@@ -106,20 +108,21 @@ userSchema.methods.changedPasswordAfter = function (JWTTimestamp) {
   return false;
 };
 
-// userSchema.methods.createPasswordResetToken = function () {
-//   const resetToken = crypto.randomBytes(32).toString('hex');
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
 
-//   this.passwordResetToken = crypto
-//     .createHash('sha256')
-//     .update(resetToken)
-//     .digest('hex');
+  // This token acts like a password that can be used one to grant access to protected routes. so we should not save in DB as plain text.
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
 
-//   console.log({ resetToken }, this.passwordResetToken);
-
-//   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
-
-//   return resetToken;
-// };
+  console.log({ resetToken }, this.passwordResetToken);
+  // 10 minutes limit. We are just adding it to the current document not saving it in DB(current document is the result of User.findOne(); )
+  this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
+  // We saved the encrypted version of the token to the DB(for later comparison), and here we return the token itself.
+  return resetToken;
+};
 
 const User = mongoose.model('User', userSchema);
 
