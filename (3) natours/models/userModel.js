@@ -55,8 +55,7 @@ const userSchema = new mongoose.Schema({
 userSchema.pre('save', async function (next) {
   // Only run this function if password was actually modified
   if (!this.isModified('password')) {
-    return;
-    next();
+    return next();
   }
 
   // Hash the password with cost of 12
@@ -69,9 +68,9 @@ userSchema.pre('save', async function (next) {
 });
 
 userSchema.pre('save', function (next) {
-    // IF password property has been modified OR IF document is being created right now, return.
+  // IF password property has been modified OR IF document is being created right now, return.
   if (!this.isModified('password') || this.isNew) return next();
-  // After this, 
+  // After this,
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
@@ -117,7 +116,7 @@ userSchema.methods.createPasswordResetToken = function () {
     .update(resetToken)
     .digest('hex');
 
-  console.log({ resetToken }, this.passwordResetToken);
+  // console.log({ resetToken }, this.passwordResetToken);
   // 10 minutes limit. We are just adding it to the current document not saving it in DB(current document is the result of User.findOne(); )
   this.passwordResetExpires = Date.now() + 10 * 60 * 1000;
   // We saved the encrypted version of the token to the DB(for later comparison), and here we return the token itself.

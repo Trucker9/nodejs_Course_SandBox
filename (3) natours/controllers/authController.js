@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 const crypto = require('crypto');
 // only getting promisify function out of util package.
 const { promisify } = require('util');
@@ -129,19 +130,19 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 // We can not pass arguments to middleware functions. so we wrap the middleware in a wrapper function and we set our arguments in the wrapper.
 // wrapper has the arguments an all it does is to return the middleware function, BUT, middleware has access to wrapper arguments thanks to closures !!!!
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
+exports.restrictTo =
+  (...roles) =>
+  (req, res, next) => {
     // roles-> roles that have access to the current route. if user role is not part of the roles array, throws error.
-    console.log(req.user.role);
+    console.log(`allowed roles: ${roles}
+    req.user: ${req.user}`);
     if (!roles.includes(req.user.role)) {
       return next(
         new AppError('You do not have permission to perform this action', 403)
       );
     }
-
     next();
   };
-};
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   // 1) --------------------- Get user based on POSTed email

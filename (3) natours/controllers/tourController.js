@@ -1,6 +1,3 @@
-
-
-
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFreatures');
 const catchAsync = require('../utils/catchAsync');
@@ -27,7 +24,7 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
 });
 
 exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id);
+  const tour = await Tour.findById(req.params.id).populate('reviews');
 
   // if no tour found, we create error and pass it to next()!
   if (!tour) {

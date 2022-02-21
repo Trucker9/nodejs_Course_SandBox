@@ -3,13 +3,14 @@ const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
-const mongoSanitizer = require('mongo-sanitizer');
+const mongoSanitizer = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
 const userRouter = require('./routes/userRoutes');
 const tourRouter = require('./routes/tourRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 /////////////////////////////////////////////
 const app = express();
@@ -83,6 +84,7 @@ app.use((req, res, next) => {
 // when there is a request on /api/v1/tours/?....  it will enter this middleware in the middleware stack and then the tourRouter will kick in.
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // ########################################### Invalid Routes
 // if no middleware from above catches the request, then its not a valid request. so we handle it right here. (last middleware)

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
+const User = require('./userModel');
 
 // Creating schema
 const schemaOptions = {
@@ -94,6 +94,52 @@ const tourSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    // --------------------------- Creating one document inside another document
+    startLocation: {
+      // Each of these subfields can have their own schema options.
+      type: {
+        type: String,
+        default: 'Point',
+        // We only want it to take one type of value (Point) among multiple GeoJSON types.
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    // --------------------------- Embedded locations
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number,
+      },
+    ],
+    // --------------------------- Embedded users.
+    // Customer passes the ID of user's that he wants to be marked as guide as an array, later with a pre-save middleware, we query for the actual user with those IDs and replace it with the actual user data. so at the end we have an array of users that are meant to be guide!
+    // guide: Array,
+
+    // --------------------------- Reference users.
+    // Here we add these id's and later when we want to access them. then we populate them with a pre query middleware.(or we can call  .populate(<fieldName>) on the query.)
+    guide: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
+    // // This can grow bigger and mess up our document, so instead of this we do virtual populate.
+    // reviews: [
+    //   {
+    //     type: mongoose.Schema.ObjectId,
+    //     ref: 'Review',
+    //   },
+    // ],
   },
   schemaOptions
 );
@@ -106,6 +152,18 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7;
 });
 
+// VIRTUAL POPULATE: KEEPING A REFERENCE TO ALL THE CHILD DOCUMENTS ON A PARENT DOCUMENT, EVEN THOUGH WE ARE USING PARENT REFERENCING ON THE CHILDREN. THIS RESULTS TO NOT INCLUDING THE INFORMATION IN THE DATA BASE, BUT STILL HAVING ACCESS TO THEM.
+// Here we have to somehow create a connection between reviews and tours.
+// 'Review' is the reference that we want to query to, and in the reviewSchema, id of current document (which is tour) is called 'tour'. so foreignField: 'tour'.
+// in the current document, same id exist in the field named _id. so localField :'_id'
+// later we populate the result of this connection in the controller. results will be available on a field named 'reviews' as we specify down here.
+// s1mple: '_id' field in the current model is called 'tour' in the review model.
+// After this, we just need to populate 'reviews' field to see the final result. we do it on the query directly in this case.
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id',
+});
 // ############################## DB MIDDLEWARE
 
 // ########## Document MIDDLEWARE
@@ -114,8 +172,21 @@ tourSchema.pre('save', function (next) {
   // this -> current document that is being saved. so slug will be saved to the document!
   this.slug = slugify(this.name, { lower: true });
   // It will stuck in POST if we dont call next();
+
   next();
 });
+// // ######### Embedding Guides.
+// // NOTE: by doing embedding like this, if any of the data of these guides changes, for (example email address), we have to write a function to search and see where that user is embedded and change the data there too. WE ARE NOT GONNA IMPLEMENT THAT IN THIS APP.
+// tourSchema.pre('save', async function (next) {
+//   const guidesIDArr = this.guides;
+//   const guidesDocumentPromisesArr = guidesIDArr.map(
+//     async (id) => await User.findById(id)
+//   );
+//   const guidesDocumentArr = await Promise.all(guidesDocumentPromisesArr);
+
+//   this.guide = guidesDocumentArr;
+//   next();
+// });
 
 // tourSchema.pre('save', function(next) {
 //   console.log('Will save document...');
@@ -145,13 +216,22 @@ tourSchema.post(/^find/, function (docs, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
   next();
 });
+// Populating results with a query middleware. this runs each time there is a new query.
+tourSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
+
+  next();
+});
 
 // ########## AGGREGATION MIDDLEWARE
 tourSchema.pre('aggregate', function (next) {
   // this.pipeline() -> array that we passed to Model.aggregate();
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
 
-  console.log(this.pipeline());
+  // console.log(this.pipeline());
   next();
 });
 
