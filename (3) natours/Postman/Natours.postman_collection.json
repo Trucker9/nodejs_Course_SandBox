@@ -12,16 +12,18 @@
 					"name": "Gett all tours",
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMGUzNWZmMDk4MGQwMzExY2ZlY2M5YyIsImlhdCI6MTY0NTA5ODU0NywiZXhwIjoxNjUyODc0NTQ3fQ.rX5Usy7rQui7KKKhdcNIpdW-24rNp1H2QI3ogxKBHwI",
+								"type": "text"
+							}
+						],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours",
+							"raw": "{{URL}}/api/v1/tours",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -37,14 +39,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours?difficulty=easy&price[gt]=500&duration[gte]=5",
+							"raw": "{{URL}}/api/v1/tours?difficulty=easy&price[gt]=500&duration[gte]=5",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -74,14 +72,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours?sort=price,ratingsAvregare",
+							"raw": "{{URL}}/api/v1/tours?sort=price,ratingsAvregare",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -103,14 +97,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours?fields=name,duration,difficulty,price",
+							"raw": "{{URL}}/api/v1/tours?fields=name,duration,difficulty,price",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -132,14 +122,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours?page=1&limit=3",
+							"raw": "{{URL}}/api/v1/tours?page=1&limit=3",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -165,14 +151,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours/top-5-cheap",
+							"raw": "{{URL}}/api/v1/tours/top-5-cheap",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -189,14 +171,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours/6204e92d6f3720376c77d00a",
+							"raw": "{{URL}}/api/v1/tours/6204e92d6f3720376c77d00a",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -213,14 +191,10 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours/tour-stats",
+							"raw": "{{URL}}/api/v1/tours/tour-stats",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -246,14 +220,10 @@
 							}
 						},
 						"url": {
-							"raw": "127.0.0.1:8000/api/v1/tours",
+							"raw": "{{URL}}/api/v1/tours",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "8000",
 							"path": [
 								"api",
 								"v1",
@@ -278,14 +248,10 @@
 							}
 						},
 						"url": {
-							"raw": "127.0.0.1:3000/api/v1/tours/3",
+							"raw": "{{URL}}/api/v1/tours/3",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -299,22 +265,28 @@
 				{
 					"name": "Delete Tour",
 					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:3000/api/v1/tours/3",
+							"raw": "{{URL}}/api/v1/tours/6204f71c443ef0510c7d5fff",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
 								"tours",
-								"3"
+								"6204f71c443ef0510c7d5fff"
 							]
 						}
 					},
@@ -326,19 +298,225 @@
 			"name": "Users",
 			"item": [
 				{
+					"name": "Auth",
+					"item": [
+						{
+							"name": "Sign up",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"jwt\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"test\",\r\n    \"email\": \"tt@something.com\",\r\n    \"password\": \"pass1234\",\r\n    \"passwordConfirm\": \"pass1234\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/v1/users/signup",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"signup"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "login",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"jwt\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwt}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"tt@something.com\",\r\n    \"password\": \"pass1234\"\r\n}\r\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/v1/users/login",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"login"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "ForgotPassword",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"email\": \"admin@something.com\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/v1/users/forgotPassword",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"forgotPassword"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Reset Password",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"jwt\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": ""
+								},
+								"url": {
+									"raw": "{{URL}}/api/v1/users/resetPassword/",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"resetPassword",
+										""
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Update passowrd",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm.environment.set(\"jwt\", pm.response.json().token);"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{jwt}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"passwordCurrent\": \"pass1234\",\r\n    \"password\": \"qqqwwwee\",\r\n    \"passwordConfirm\": \"qqqwwwee\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{URL}}/api/v1/users/updateMyPassword",
+									"host": [
+										"{{URL}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"users",
+										"updateMyPassword"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
 					"name": "Get all users",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:3000/api/v1/users",
+							"raw": "{{URL}}/api/v1/users",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
@@ -354,19 +532,189 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "127.0.0.1:3000/api/v1/users/22",
+							"raw": "{{URL}}/api/v1/users/621403b4d252bc23dcda70ab",
 							"host": [
-								"127",
-								"0",
-								"0",
-								"1"
+								"{{URL}}"
 							],
-							"port": "3000",
 							"path": [
 								"api",
 								"v1",
 								"users",
-								"22"
+								"621403b4d252bc23dcda70ab"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update User Data",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.environment.set(\"jwt\", pm.response.json().token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"jonas\",\r\n    \"password\": \"pass1234\",\r\n    \"passwordConfirm\": \"pass1234\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/users/updateMe",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"updateMe"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/users/deleteMe",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"users",
+								"deleteMe"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Reviews",
+			"item": [
+				{
+					"name": "add review",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"review\": \"Ghaza sard bood\",\r\n   \"rating\": 4,\r\n   \"tour\": \"5c88fa8cf4afda39709c2955\",\r\n   \"user\": \"621403b4d252bc23dcda70ab\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/reviews",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all reviews",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n   \"review\": \"Fucked up tour\",\r\n   \"rating\": 4,\r\n   \"tour\": \"5c88fa8cf4afda39709c2955\",\r\n   \"user\": \"621403b4d252bc23dcda70ab\" \r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{URL}}/api/v1/reviews",
+							"host": [
+								"{{URL}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"reviews"
 							]
 						}
 					},
