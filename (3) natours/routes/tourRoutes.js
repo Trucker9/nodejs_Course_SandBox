@@ -1,12 +1,16 @@
 const express = require('express');
 const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
+const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
+// mounting another router on this router( if url was like "/svdvdfvdfbkdn/reviews" then use reviewRouter)
+// but now one thing is missing, reviewRouter doesn't have access to the "tourId". so we need to use {mergeParams:true} in it.
+router.use('/:tourId/reviews', reviewRouter);
 // Custom routes
 // First we mutate the request object with aliasTopTour middleware, then we pass the request to the getAllTours !
-// we need to pre fill the req.query with : limit=5&sort=ratingsAverage,price and send it to getAllTours middleware.
+// we need to prefill the req.query with : limit=5&sort=ratingsAverage,price and send it to getAllTours middleware.
 router
   .route('/top-5-cheap')
   .get(tourController.aliasTopTour, tourController.getAllTours);

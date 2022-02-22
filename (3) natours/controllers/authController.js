@@ -4,16 +4,15 @@ const crypto = require('crypto');
 const { promisify } = require('util');
 // See Docs. its good.
 const jwt = require('jsonwebtoken');
-const User = require('./../models/userModel');
-const catchAsync = require('./../utils/catchAsync');
-const AppError = require('./../utils/appError');
-const sendEmail = require('./../utils/email');
+const User = require('../models/userModel');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
+const sendEmail = require('../utils/email');
 
-const signToken = (id) => {
-  return jwt.sign({ id: id }, process.env.JWT_SECRET, {
+const signToken = (id) =>
+  jwt.sign({ id: id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
-};
 // Creating a JWT with "id" and "secret".
 const createSendToken = (user, statusCode, res) => {
   const token = signToken(user._id);
@@ -161,7 +160,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     'host'
   )}/api/v1/users/resetPassword/${resetToken}`;
 
-  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}.\nIf you didn't forget your password, please ignore this email!`;
+  const message = `Forgot your password? Submit a PATCH request with your new password and passwordConfirm to: ${resetURL}\nIf you didn't forget your password, please ignore this email!`;
 
   try {
     await sendEmail({

@@ -1,7 +1,8 @@
 const Tour = require('../models/tourModel');
-const APIFeatures = require('../utils/apiFreatures');
+const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
+const factory = require('./handlerFactory');
 
 exports.aliasTopTour = (req, res, next) => {
   req.query.limit = '5';
@@ -22,82 +23,72 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
     data: { tours: tours },
   });
 });
+exports.getAllTours = factory.getAll(Tour);
 
-exports.getTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findById(req.params.id).populate('reviews');
+// exports.getTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findById(req.params.id).populate('reviews');
 
-  // if no tour found, we create error and pass it to next()!
-  if (!tour) {
-    next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
-    return;
-  }
-
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: tour,
-    },
-  });
-});
-
-// exports.createTour = async (req, res) => {
-//   try {
-//     const newTour = await Tour.create(req.body);
-
-//     res.status(201).send({
-//       status: 'success',
-//       data: {
-//         tours: newTour,
-//       },
-//     });
-//   } catch (err) {
-//     res.status(400).json({
-//       status: 'fail',
-//       message: err,
-//     });
+//   // if no tour found, we create error and pass it to next()!
+//   if (!tour) {
+//     next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
+//     return;
 //   }
-// };
 
-exports.createTour = catchAsync(async (req, res, next) => {
-  const newTour = await Tour.create(req.body);
-  res.status(201).send({
-    status: 'success',
-    data: {
-      tours: newTour,
-    },
-  });
-});
-exports.updateTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-  });
-  if (!tour) {
-    next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
-    return;
-  }
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: tour,
-    },
-  });
-});
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour: tour,
+//     },
+//   });
+// });
+exports.getTour = factory.getOne(Tour, { path: 'reviews' });
 
-exports.deleteTour = catchAsync(async (req, res, next) => {
-  const tour = await Tour.findByIdAndDelete(req.params.id);
+// exports.createTour = catchAsync(async (req, res, next) => {
+//   const newTour = await Tour.create(req.body);
+//   res.status(201).send({
+//     status: 'success',
+//     data: {
+//       tours: newTour,
+//     },
+//   });
+// });
+exports.createTour = factory.createOne(Tour);
 
-  if (!tour) {
-    next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
-    return;
-  }
-  res.status(200).json({
-    status: 'success',
-    data: {
-      tour: null,
-    },
-  });
-});
+// exports.updateTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true,
+//   });
+//   if (!tour) {
+//     next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
+//     return;
+//   }
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour: tour,
+//     },
+//   });
+// });
+exports.updateTour = factory.updateOne(Tour);
+
+// exports.deleteTour = catchAsync(async (req, res, next) => {
+//   const tour = await Tour.findByIdAndDelete(req.params.id);
+
+//   if (!tour) {
+//     next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
+//     return;
+//   }
+//   res.status(200).json({
+//     status: 'success',
+//     data: {
+//       tour: null,
+//     },
+//   });
+// });
+
+// Returns the function above!.
+exports.deleteTour = factory.deleteOne(Tour);
 
 exports.getTourStats = catchAsync(async (req, res, next) => {
   // https://docs.mongodb.com/v5.0/reference/operator/aggregation-pipeline/
