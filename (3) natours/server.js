@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+
 dotenv.config({
   path: './config.env',
 });
@@ -45,7 +46,7 @@ process.on('unhandledRejection', (err) => {
   console.log('UNHANDLED REJECTION! Shutting down ...');
   console.log(err);
   // First we close the server (giving server time to handle pending requests)
-  // Then we shutdown with the callback function.
+  // Then we shut down with the callback function.
   // some tools will be used to restart the node app.
   server.close(() => process.exit(1));
 });

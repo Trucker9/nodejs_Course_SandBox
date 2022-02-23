@@ -24,68 +24,9 @@ exports.getAllTours = catchAsync(async (req, res, next) => {
   });
 });
 exports.getAllTours = factory.getAll(Tour);
-
-// exports.getTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findById(req.params.id).populate('reviews');
-
-//   // if no tour found, we create error and pass it to next()!
-//   if (!tour) {
-//     next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
-//     return;
-//   }
-
-//   res.status(200).json({
-//     status: 'success',
-//     data: {
-//       tour: tour,
-//     },
-//   });
-// });
 exports.getTour = factory.getOne(Tour, { path: 'reviews' });
-
-// exports.createTour = catchAsync(async (req, res, next) => {
-//   const newTour = await Tour.create(req.body);
-//   res.status(201).send({
-//     status: 'success',
-//     data: {
-//       tours: newTour,
-//     },
-//   });
-// });
 exports.createTour = factory.createOne(Tour);
-
-// exports.updateTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-//     new: true,
-//     runValidators: true,
-//   });
-//   if (!tour) {
-//     next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
-//     return;
-//   }
-//   res.status(200).json({
-//     status: 'success',
-//     data: {
-//       tour: tour,
-//     },
-//   });
-// });
 exports.updateTour = factory.updateOne(Tour);
-
-// exports.deleteTour = catchAsync(async (req, res, next) => {
-//   const tour = await Tour.findByIdAndDelete(req.params.id);
-
-//   if (!tour) {
-//     next(new AppError(`No tour found with ${req.params.id} ID.`, 404));
-//     return;
-//   }
-//   res.status(200).json({
-//     status: 'success',
-//     data: {
-//       tour: null,
-//     },
-//   });
-// });
 
 // Returns the function above!.
 exports.deleteTour = factory.deleteOne(Tour);
@@ -162,7 +103,7 @@ exports.getMonthlyPlan = catchAsync(async (req, res, next) => {
       $addFields: { month: '$_id' },
     },
     {
-      // if we set 0 for each value, it wont show up in results.
+      // if we set 0 for each value, it won't show up in results.
       $project: {
         _id: 0,
       },
