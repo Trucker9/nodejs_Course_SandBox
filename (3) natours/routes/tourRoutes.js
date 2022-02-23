@@ -16,13 +16,23 @@ router
   .get(tourController.aliasTopTour, tourController.getAllTours);
 
 router.route('/tour-stats').get(tourController.getTourStats);
-router.route('/monthly-plan/:year').get(tourController.getMonthlyPlan);
+router
+  .route('/monthly-plan/:year')
+  .get(
+    authController.restrictTo('admin', 'lead-guide', 'user'),
+    tourController.deleteTour,
+    tourController.getMonthlyPlan
+  );
 
 router
   .route('/')
   // If protect throws error, user can't access to the next middleware which is tour controller.
-  .post(tourController.createTour)
-  .get(authController.protect, tourController.getAllTours);
+  .post(
+    authController.protect,
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.createTour
+  )
+  .get(tourController.getAllTours);
 router
   .route('/:id')
   .get(tourController.getTour)
@@ -31,6 +41,10 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour
   )
-  .patch(tourController.updateTour);
+  .patch(
+    authController.restrictTo('admin', 'lead-guide'),
+    tourController.deleteTour,
+    tourController.updateTour
+  );
 
 module.exports = router;
