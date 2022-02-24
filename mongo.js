@@ -29,4 +29,8 @@ adding documents to collection: db.<collectionName>.insertMany ( [ {doc1} , {doc
       delete multiple: db.<collectionName>.deleteMany({filterObj})
       delete all: db.<collectionName>.deleteMany({})
 
+
+
+    .explain() -> Calling this method on the query returns some analytics results.
+    s
 */

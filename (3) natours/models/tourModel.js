@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const User = require('./userModel');
 
 // Creating schema
 const schemaOptions = {
@@ -143,7 +142,10 @@ const tourSchema = new mongoose.Schema(
   },
   schemaOptions
 );
-
+// ############################## Indexes
+// If a field is wildly queried for, it's a good practice to add index for it. so mongoDB can easily search them and find the results faster.
+// 1: ascending order. -1: descending order.
+tourSchema.index({ price: 1 });
 // ############################## Virtual Properties
 // These properties wont be saved in DB, but will be calculated each time we get documents.
 // NOTE: since these properties are not a part of the database, we can not use them in queries. one trick is to use them in controllers, but its not a good practice. these two must stay separate.
@@ -164,9 +166,10 @@ tourSchema.virtual('reviews', {
   foreignField: 'tour',
   localField: '_id',
 });
-// ############################## DB MIDDLEWARE
+// ########################################################################### DB MIDDLEWARES
 
 // ########## Document MIDDLEWARE
+// Defference between query middleware and document middleware : https://stackoverflow.com/questions/63091182/what-is-the-difference-between-document-middleware-model-middleware-aggregate
 // runs before .save() and .create() (NOT FOR UPDATE)
 tourSchema.pre('save', function (next) {
   // this -> current document that is being saved. so slug will be saved to the document!
@@ -199,6 +202,7 @@ tourSchema.pre('save', function (next) {
 // });
 
 // ########## QUERY MIDDLEWARE
+// Defference between query middleware and document middleware : https://stackoverflow.com/questions/63091182/what-is-the-difference-between-document-middleware-model-middleware-aggregate
 // only works for find(); :
 // tourSchema.pre('find', function(next) {
 // works for all find methods :
@@ -235,7 +239,6 @@ tourSchema.pre('aggregate', function (next) {
   next();
 });
 
-// Passing the name and schema to create Model out of the schema.
 const Tour = mongoose.model('Tour', tourSchema);
 
 module.exports = Tour;

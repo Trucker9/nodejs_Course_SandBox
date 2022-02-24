@@ -77,9 +77,9 @@ exports.getAll = (Model) =>
       .sort()
       .limitFields()
       .paginate();
-    // const doc = await features.query.explain();
+    // // analytics
+    // const doc = await features.mongooseQuery.explain();
     const doc = await features.mongooseQuery;
-      console.log(doc);
     // SEND RESPONSE
     res.status(200).json({
       status: 'success',
