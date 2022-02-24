@@ -25,6 +25,14 @@ router
   );
 
 router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+// Can also be done like this
+// /tours-within?distance=233&center=-40,45&unit=mi
+
+router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+
+router
   .route('/')
   // If protect throws error, user can't access to the next middleware which is tour controller.
   .post(

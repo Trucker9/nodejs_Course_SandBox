@@ -41,6 +41,10 @@ const reviewSchema = new mongoose.Schema(
   schemaOptions
 );
 
+// #################################################### Preventing more than one reviews from one user.
+// What we want here is that the combination of user and tour, always be unique. in other words, no duplicate
+// user ID and tour ID. we can do it by indexes like this:
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 reviewSchema.pre(/^find/, function (next) {
   // // Limiting populated fields.
   // this.populate({
