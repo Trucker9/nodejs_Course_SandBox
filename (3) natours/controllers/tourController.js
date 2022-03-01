@@ -1,8 +1,74 @@
+const multer = require('multer');
+const sharp = require('sharp');
 const Tour = require('../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('../utils/appError');
 const factory = require('./handlerFactory');
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not an image! Please upload only images.', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+// If there was one image:  upload.single('image') -> Result at: req.file
+// If there were multiple images with the same name:  upload.array('images', 5)-> Result at: req.files
+// If there were mix of them:
+exports.uploadTourImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 3 },
+]);
+
+exports.resizeTourImages = catchAsync(async (req, res, next) => {
+  // If files were missing.
+  if (!req.files.imageCover || !req.files.images) return next();
+
+  // 1) Cover image
+  // For adding the name of the image to the database, we have to add the name to req.body because we update tours
+  // with an update method of the factory which accepts req.body and applies the changes to the DB.
+  // So we add the file name to req.body and later it will be added to DB with the factory.updateOne(Tour) method
+  req.body.imageCover = `tour-${req.params.id}-${Date.now()}-cover.jpeg`;
+  await sharp(req.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${req.body.imageCover}`);
+
+  // 2) Images
+  // Adding image names to body (later will be updated in DB).
+  req.body.images = [];
+
+  // .map() method that we used on the images, returns an array of promises (because its callback function is async).
+  // Promise.all() awaits for the result of all promises that .map() has returned.
+  // then next(); will be executed. (after that the processing of the images has finished)
+  // if we don't do it like this, next() will be called immediately and req.body.images will remain empty and can't
+  // be processed later for DB.
+  await Promise.all(
+    req.files.images.map(async (file, i) => {
+      const filename = `tour-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+      await sharp(file.buffer)
+        .resize(2000, 1333)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      req.body.images.push(filename);
+    })
+  );
+  // After Promise.all() is finished, everything is done and next(); will be called.
+
+  next();
+});
 
 exports.aliasTopTour = (req, res, next) => {
   req.query.limit = '5';
