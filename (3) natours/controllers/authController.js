@@ -22,6 +22,7 @@ const createSendToken = (user, statusCode, res) => {
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
     // Browser can just receive, and send back the cookie. not modify it.
+    // Not even delete it ( so we can not sign the user out simply by just removing it)
     httpOnly: true,
   };
   // secure:true   ==  cookie will be sent over HTTPS only
@@ -55,7 +56,6 @@ exports.signup = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-
   // 1) Check if email and password exist
   if (!email || !password) {
     next(new AppError('Please provide email and password!', 400));
@@ -63,9 +63,8 @@ exports.login = catchAsync(async (req, res, next) => {
     return;
   }
   // 2) Check if user exists && password is correct
-  // Password wont be selected by default because it has "select: false" property. here we add it to the user object explicitly.
+  // Password won't be selected by default because it has "select: false" property. here we add it to the user object explicitly.
   const user = await User.findOne({ email }).select('+password');
-
   if (!user || !(await user.correctPassword(password, user.password))) {
     return next(new AppError('Incorrect email or password', 401));
   }
@@ -73,6 +72,17 @@ exports.login = catchAsync(async (req, res, next) => {
   // 3) If everything ok, send token to client
   createSendToken(user, 200, res);
 });
+
+// Here we send another cookie to the client to overwrite the token he has. then we give it a short expiration time.
+// our cookie is sent over http only, so we con not delete it.
+exports.logout = (req, res) => {
+  res.cookie('jwt', 'fakeToken', {
+    // expires in 10 seconds
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: 'success' });
+};
 
 // ######################################################### Protected routes
 // Only logged in users can access this routes.
@@ -87,6 +97,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
+    // If there was no token in the authorization header, then check the cookies.
+  } else if (req.cookies.jwt) {
+    token = req.cookies.jwt;
   }
 
   if (!token) {
@@ -122,10 +135,52 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   // Adding current user (later we need user info and we pick it up from req Object.)
   req.user = currentUser;
-  console.log('###################' + req.user);
+  // for pug
+  res.locals.user = currentUser;
+
   // GRANT ACCESS TO PROTECTED ROUTE
   next();
 });
+
+// Only for rendered pages, there will be no errors!
+// We don't want to throw an error that ends up in the global error handling middleware. because in this case, all
+// other middleware will be skipped and the error will be shown to the user.
+// for example if the JWT was wrong(user was not logged in or was logging out) , we want to go to the next
+// middleware and catch that error locally.
+exports.isLoggedIn = async (req, res, next) => {
+  if (req.cookies.jwt) {
+    try {
+      // 1) verify token
+      const decoded = await promisify(jwt.verify)(
+        req.cookies.jwt,
+        process.env.JWT_SECRET
+      );
+
+      // 2) Check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3) Check if user changed password after the token was issued
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // if all the above was correct, then THERE IS A LOGGED-IN USER
+      // res.locals.<something> : in pug templates, we get access to this <something>.(we use it in _header.pug)
+      // so if there was a logged-in user, we add the user to res.locals and then we go to the next middleware.
+      // if there was a problem or there was no logged-in in user, we return from this function and no user will be
+      // added to locals.
+      res.locals.user = currentUser;
+      return next();
+    } catch (err) {
+      return next();
+    }
+  }
+  // When this next is called, a user is added to req.locals
+  next();
+};
 
 // We can not pass arguments to middleware functions. so we wrap the middleware in a wrapper function and we set our arguments in the wrapper.
 // wrapper has the arguments an all it does is to return the middleware function, BUT, middleware has access to wrapper arguments thanks to closures !!!!

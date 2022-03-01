@@ -51,6 +51,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+// Disable this before importing user data.
 // Right before saving the password we encrypt it.
 userSchema.pre('save', async function (next) {
   // Only run this function if password was actually modified

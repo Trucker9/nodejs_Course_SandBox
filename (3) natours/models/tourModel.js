@@ -128,7 +128,7 @@ const tourSchema = new mongoose.Schema(
 
     // --------------------------- Reference users.
     // Here we add these id's and later when we want to access them. then we populate them with a pre query middleware.(or we can call  .populate(<fieldName>) on the query.)
-    guide: [
+    guides: [
       {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
