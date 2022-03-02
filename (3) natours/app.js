@@ -15,6 +15,7 @@ const userRouter = require('./routes/userRoutes');
 const tourRouter = require('./routes/tourRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
 const viewRouter = require('./routes/viewRoutes');
+const bookingRouter = require('./routes/bookingRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 /////////////////////////////////////////////
 const app = express();
@@ -23,11 +24,12 @@ app.set('views', path.join(__dirname, 'views'));
 
 //############################################
 //############################################ Global Middlewares (apply on all requests)
-// Using middleware: req & res Objects go through middleware stack like a pipe line. here we are adding express.json() to the middleware stack.
-// each middleware will send these objects to next( by calling next(); ) middleware and the last one will send it to the client.
-// order of middleware is based on what order we write them.
-// Middleware applies to all request on the server and route functions are some kind of middleware which end the pipeline by sending back the result to the client.
-// NOTE: IF WE WANT TO APPLY A METHOD ON ALL REQUESTS, we define it as middleware, and write it before any routing middleware
+// Using middleware: req & res Objects go through middleware stack like a pipe line. here we are adding express.json()
+// to the middleware stack. each middleware will send these objects to next( by calling next(); ) middleware and the
+// last one will send it to the client. order of middleware is based on what order we write them. Middleware applies to
+// all request on the server and route functions are some kind of middleware which end the pipeline by sending back the
+// result to the client. NOTE: IF WE WANT TO APPLY A METHOD ON ALL REQUESTS, we define it as middleware, and write it
+// before any routing middleware
 
 // Security: Using default helmet settings. Each node app must have this.
 app.use(helmet());
@@ -55,7 +57,8 @@ app.use(express.urlencoded({ extended: true, limit: '10kb' }));
 app.use(mongoSanitizer());
 
 // Data sanitization against XSS
-// removes injected HTML and JS data (later the value of properties will be placed in HTML and imagine if value was HTML! )
+// removes injected HTML and JS data (later the value of properties will be placed in HTML and imagine if value was
+// HTML! )
 app.use(xss());
 // Serving static files:
 // Basically telling the express that if there is a request for static file ( favicon, css, ... ) search in this
@@ -87,17 +90,25 @@ app.use((req, res, next) => {
 });
 
 // // FOR CROSS DOMAIN REQUESTS
-// app.use((req, res, next) => {
-//   res.setHeader(
-//     'Content-Security-Policy',
-//     "connect-src *; default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://*" +
-//       " 'unsafe-inline' 'unsafe-eval'"
-//   );
-//   res.setHeader('Access-Control-Allow-Origin', '*');
-//   next();
-// });
-// Allov Access-Control-Allow-Origin
-// app.use(cors({ origin: 'http://localhost:8000' }));
+app.use((req, res, next) => {
+  res.setHeader(
+    'Content-Security-Policy',
+    // "connect-src *; default-src *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'"
+    "connect-src *; default-src *; style-src 'self' http://* 'unsafe-inline'; script-src *"
+  );
+  res.removeHeader('Cross-Origin-Resource-Policy');
+  res.removeHeader('Cross-Origin-Embedder-Policy');
+  // res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  // res.header('Access-Control-Allow-Origin', '*');
+  // res.header(
+  //   'Access-Control-Allow-Headers',
+  //   'Origin, X-Requested-With, Content-Type, Accept'
+  // );
+  next();
+});
+
+// Allow Access-Control-Allow-Origin
+// app.use(cors({ origin: 'http://127.0.0.1:8000' }));
 
 // logging request time.
 app.use((req, res, next) => {
@@ -109,16 +120,17 @@ app.use((req, res, next) => {
 //############################################
 //############################################ Routes
 // Mounting router on a route by Using router as middleware
-// when there is a request on /api/v1/tours/?....  it will enter this middleware in the middleware stack and then the tourRouter will kick in.
+// when there is a request on /api/v1/tours/?....  it will enter this middleware in the middleware stack and then the
+// tourRouter will kick in.
 app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/bookings', bookingRouter);
 
 // ########################################### Invalid Routes
-// if no middleware from above catches the request, then its not a valid request. so we handle it right here. (last middleware)
-// .all() -> any HTTP method.
-// "*" -> any route.
+// if no middleware from above catches the request, then its not a valid request. so we handle it right here. (last
+// middleware) .all() -> any HTTP method. "*" -> any route.
 app.all('*', (req, res, next) => {
   // res.status(404).json({
   //   status: 'fail',
@@ -130,8 +142,9 @@ app.all('*', (req, res, next) => {
 
 // ########################################## Error handling middleware
 // By giving app.use() a function with 4 arguments, express recognize it as error handling middleware.
-// When error happens, we pass the error object to the next(); method of that middleware. express skips all other middlewares and carries that error to this error handling middleware!
-// Also: if there is an error in middleware codes, like syntax error, the express will automatically go to the error handling middleware.
+// When error happens, we pass the error object to the next(); method of that middleware. express skips all other
+// middlewares and carries that error to this error handling middleware! Also: if there is an error in middleware
+// codes, like syntax error, the express will automatically go to the error handling middleware.
 app.use(globalErrorHandler);
 
 module.exports = app;
