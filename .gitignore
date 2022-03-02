@@ -1,8 +1,2 @@
-
-(1) node-farm/node_modules
-
-(2) how-node-works/node_modules
-
-(3) natours/node_modules
-
-
+./node_modules
+./(3) natours
